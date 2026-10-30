@@ -2,6 +2,9 @@
 name = "chatheads-native"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.95"
+license = "MIT"
+description = "A player's head left of every chat line they wrote"
 
 [lib]
 # This exact source is also injected as a same-crate module by horizon-mixins.

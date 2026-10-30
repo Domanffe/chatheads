@@ -6,7 +6,7 @@
 pub const ID: &str = "chatheads";
 pub const NAME: &str = "ChatHeads";
 pub const VERSION: &str = "0.1.0";
-pub const DESCRIPTION: &str = "A player's head left of every chat line they wrote, as Chat Heads does: 8x8 GUI pixels on the chat's own background, the line's text moved right for it. A native mod for Horizon.";
+pub const DESCRIPTION: &str = "A player's head left of every chat line they wrote.";
 
 /// The head's side and the face's corner in a player skin, in GUI pixels: a
 /// skin is 64x64 and its face is the 8x8 at (8,8). A line's text moves right

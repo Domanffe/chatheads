@@ -1,99 +1,46 @@
-# ChatHeads — нативный мод Horizon
+# ChatHeads
 
-Голова игрока слева от каждой строки чата: 8×8 GUI-пикселя на собственном фоне
-чата, со сдвигом текста строки на 10 px вправо (8 голова + 2 отступ), ровно как
-Java-мод Chat Heads. Строки без отправителя-игрока (системные, `/me`, команды,
-продолжения переноса) остаются без головы.
+![ChatHeads](docs/icon.png)
 
-Bundle для [horizon-mixins](https://github.com/horizon-rust/horizon-mixins) на
-ревизию `a46ce6898bd72016e061aaec1afc1375b384deac` (см.
-`[compatibility]` в `mixins/chatheads/horizon-mixin.toml`).
+A player's 8x8 skin face to the left of every chat line they wrote, for
+[Horizon](https://github.com/horizon-rust/horizon). A native mod (a horizon-mixins bundle), built into
+the game by the launcher.
 
-## Что делает
+## What it does
 
-- Голова — лицо скина, 8×8 texel'ов из области (8,8) текстуры 64×64, в
-  масштабе чата (×1 при обычном масштабе), прозрачность — как у самой строки
-  (строка гаснет — голова гаснет вместе с ней).
-- Скин берётся так же, как у внутритекстовых head-компонентов игры:
-  `gui.atlas.object_skins["name:<ник>"]` (ключи `name:` и `id:` заполняет
-  `remote.rs` для игроков из tab-list'а). Если скин для профиля не разрешён —
-  один из стандартных скинов `tab_list::default_skin(hash(ник))`, стабильный
-  для одного и того же ника (то есть в одиночной игре видна стандартная голова,
-  а не «пусто»). Ничего не выдумывается: если в атласе нет ни скина, ни
-  стандартного, голова не рисуется.
-- История чата и новые строки рисуются одинаково: голова считается по каждой
-  видимой строке на каждом кадре, ничего не кэшируется по сообщениям.
+- The face comes from the skin the game resolved for that profile; with none resolved, a stable default
+  skin picked by the name, so a player always keeps the same head.
+- System messages, `/me` lines and wrapped continuations have no `<Name>` prefix and get no head.
+- The head fades with its line, and the chat's own rules hold: F1 hides it, an open chat shows it over
+  its input.
 
-## Настройка
+## Settings
 
-Options → Mods → **ChatHeads 0.1.0** — одна кнопка `Chat heads: ON/OFF`.
-Хранится файлом `heads` в `<instance>/horizon-mods/.horizon-mod-data/chatheads/`
-(как у WebAssembly-модов, через `native_setting`/`native_set_setting`).
+**Options > Mods > ChatHeads > Settings** — one value: chat heads on or off.
 
-## Как это устроено (и почему головы не закрывает фон чата)
+## Known limit
 
-`native_hud` вызывается в `draw_extras` **до** чата, поэтому рисовать головы
-оттуда нельзя — фон строк чата (`Chat::layout` → `hud_layout::paint`) закрасил
-бы их. Хуки стоят иначе:
+The chat's hit-test does not know about the 10 px indent, so clicking a link in chat lands 10 px left of
+its pixels. horizon-mixins refuses the injection that would fix it (`E_UNSUPPORTED_CONTROL_FLOW`), so it
+needs a game-side hook.
 
-| Хук | Что делает |
-|---|---|
-| `Chat::draw` (render-крейт), `MODIFY_VARIABLE` на локальной `draws` | перед отрисовкой сдвигает `Text.x` строк чата с 0 на 10 — освобождает полосу под голову. Только когда мод включён (статик `native_chatheads_layout::ON`). |
-| `Game::draw_chat` HEAD | выставляет `ON` = «мод включён и настройка ON» — до того, как чат разложен в этом же кадре, поэтому задержки в кадр нет. |
-| `Game::draw_chat` RETURN | после того как чат нарисован (фон + строки), рисует головы прямо в `HudBatch` (`rect_uv`) в экранных координатах, повторяя трансформ чата (`scale`, сдвиг 4 px). |
-| `native_mods`, `native_settings`, `native_settings_click` | строка в Options → Mods, кнопка настройки и её обработка. |
+## Building
 
-Позиции строк не угадываются: хук на RETURN заново спрашивает у чата
-`Chat::layout(...)` и берёт из него `x/y/color` каждой строки (второй вызов
-раскладки за кадр — дешёвый, строки уже перенесены по словам).
+The bundle is `mixins/chatheads`; `runtime.rs` is also the standalone crate for its tests:
 
-Файлы:
-
-```
-mixins/chatheads/horizon-mixin.toml   биндинг: 3 модуля, 6 инъекций
-mixins/chatheads/runtime.rs           чистая логика + тесты (он же lib для cargo test)
-mixins/chatheads/glue.rs              игра: настройка, поиск скина, отрисовка
-mixins/chatheads/shift.rs             render-крейт: сдвиг текста строк + статик ON
-mixins/chatheads/{list,settings,click}.rs   страница мода
-mixins/chatheads/{mark,heads,shifted}.rs    хелперы точек инъекций
+```sh
+cargo test
 ```
 
-## Тесты и проверки
+The game build is the launcher's own:
 
-```
-# чистая логика, без сборки игры
-CARGO_HOME=<launcher>/cargo CARGO_TARGET_DIR=./target cargo test
-
-# валидация и стейджинг (игру не собирает)
-horizon-mixins plan  --workspace <source> --mods mixins --out build/plan.json
-horizon-mixins apply --workspace <source> --mods mixins --out build/stage
+```sh
+horizon-launcher native-build "…/mixins/chatheads" --trust-native-code
 ```
 
-6 инъекций, 3 модуля, `status: ok`. 6 unit-тестов: разбор `<Ник>` (включая
-системные строки, `/me`, перенос, невалидные ники), геометрия головы на разных
-масштабах чата, настройка (load/labels/click/saved), стабильность `seed`.
+It pins Horizon commit `a46ce6898bd72016e061aaec1afc1375b384deac` and hooks `Game::draw_chat` (HEAD and
+RETURN) and `Chat::draw` (a variable), so it builds on that commit's source.
 
-## Известные ограничения
+## Publishing
 
-- **Клик/наведение по ссылкам в чате смещены на 10 px влево**: игра считает
-  попадание по тексту от x = 0 (`Chat::style_at`), а текст сдвинут вправо, чтобы
-  освободить место голове. Текст кликабелен, но попадать надо на 10 px левее.
-  Так же ведёт себя «Chat is restricted» и подсказки по hover.
-- Сдвигаются **все** строки чата (и системные — без головы), чтобы левый край
-  был ровным.
-- Голова рисуется по каждой *строке*, а не по сообщению: у перенесённого на
-  несколько строк сообщения голова только у первой строки (остальные начинаются
-  не с `<`).
-- Скин обновляется, когда игра его разрешила: до этого — стандартная голова;
-  смена скина на сервере подхватится сама.
-- Слоя шляпы (`hat`, вторая текстура) нет — только лицо.
-- Мод односторонний (только клиент), протокол не меняет.
-- `cargo test` самого крейта `horizon-client-render` (его собственные тесты
-  чата) проверяет `x == 0` у строк — после сдвига они ожидаемо упадут; сборка
-  (`cargo build`) от этого не страдает. Так же ведёт себя любой мод,
-  сдвигающий текст чата.
-
-## Сборку и запуск делает лаунчер
-
-Мод не собирался и не запускался здесь (см. `PROOF.md`): проверены только
-`plan`/`apply` и unit-тесты чистой логики.
+See [PUBLISH.md](PUBLISH.md).
