@@ -5,10 +5,9 @@ use std::cell::RefCell;
 use std::sync::atomic::Ordering;
 
 use horizon_client::hud::{HudAtlas, HudBatch, Rect};
-use horizon_client::hud_layout::GuiDraw;
 
 use crate::game::chat::native_chatheads as m;
-use crate::game::{Game, Screen};
+use crate::game::Game;
 use horizon_client::chat::native_chatheads_layout as layout;
 
 struct State {
@@ -53,47 +52,28 @@ pub(crate) fn mark(game: &Game<'_>) {
         game.native_on(m::ID) && settings(game).heads,
         Ordering::Relaxed,
     );
+    // A frame that paints no line must not keep the last frame's heads.
+    layout::clear();
 }
 
 /// Tail of `draw_chat`: a player's head left of each line they wrote, over
-/// the chat's own background. The chat laid its lines out already, so this
-/// asks for the same layout rather than guessing where a line went.
+/// the chat's own background. `shift.rs` recorded the lines it moved right,
+/// so this asks the paint it already did rather than laying the chat out
+/// again.
 pub(crate) fn heads(game: &Game<'_>, batch: &mut HudBatch) {
     if !layout::ON.load(Ordering::Relaxed) {
         return;
     }
-    // The early return of `draw_chat`: F1 hides the chat unless it is open.
-    let focused = game.screen == Screen::Chat;
-    if game.ui.hide_gui && !focused {
-        return;
-    }
     let scale = game.ui.chat.options.scale as f32;
-    let draws = game
-        .ui
-        .chat
-        .layout(batch.height as i32, game.ticks, focused);
-    for draw in &draws {
-        let GuiDraw::Text {
-            text, x, y, color, ..
-        } = draw
-        else {
-            continue;
-        };
-        // The chat's lines are the text it lays out at x = 0 (`shift.rs`
-        // moves them right for the head, on the copy it paints).
-        if *x != 0 {
-            continue;
-        }
-        let line = text.plain();
+    for (x, y, alpha, line) in layout::lines() {
         let Some(name) = m::sender(&line) else {
             continue;
         };
         let Some(face) = face(&game.gui.atlas, name) else {
             continue;
         };
-        let (x, y, side) = m::head(*x, *y, scale);
+        let (x, y, side) = m::head(x, y, scale);
         // The line's own opacity, so a head fades out with its line.
-        let alpha = (*color >> 24) as u8;
         batch.rect_uv(
             x,
             y,
