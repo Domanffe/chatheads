@@ -74,3 +74,15 @@ horizon-mixins apply --workspace <source> --mods E:/Projects/hz-mods/chatheads/m
   как верх строки; проверить `bottom_to_text` в `crates/horizon-client-render/src/chat.rs`.
 - Текст не сдвинулся, головы поверх букв → инъекция `shift` не сработала
   (статик `ON` не выставлен: смотреть `mark`, порядок хуков `draw_chat`).
+
+## Measured (2026-10-30)
+
+- Built with `horizon-launcher native-build … --trust-native-code` on
+  `a46ce6898bd72016e061aaec1afc1375b384deac`; `horizon-mixins apply` reported
+  `injections: 6, modules: 3, status: ok`.
+- Scene: scratch world, `horizon-ctl chat "hello from chatheads"` (a real player chat line, not a
+  system message). The screenshot shows `<Player88145> hello from chatheads` with an 8×8 head drawn
+  to its left and the line's text shifted right by 10 px; the three system messages above it have no
+  head.
+- The head came from the built-in fallback (a default skin by name hash): single player has no
+  downloaded skin for this profile. A real multiplayer skin was not observed.
