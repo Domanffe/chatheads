@@ -6,7 +6,7 @@ only you can do.
 ## The file
 
 `E:\Projects\hz-mods\dist\chatheads-0.1.0.hnmod` — 8366 bytes
-SHA-256 `33f6d27f5f9bdd9fa4bd2fee43d4ce94190490f38b0b64d4fee1319783c2dd66`
+SHA-256 `c20605c24e29a762b9aea85cba1b0cc7955955a40a031efae70a5b01e4e79df4`
 
 It holds `horizon-native.json` (game 26.3, schema 1, pinned to Horizon `a46ce68` and horizon-mixins
 `3f99a5c6`) and `mixins/chatheads/`.
