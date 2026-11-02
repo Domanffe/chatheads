@@ -5,11 +5,11 @@ only you can do.
 
 ## The file
 
-`E:\Projects\hz-mods\dist\chatheads-0.1.0.hnmod` — 8366 bytes
-SHA-256 `c20605c24e29a762b9aea85cba1b0cc7955955a40a031efae70a5b01e4e79df4`
+`C:\Users\world\Documents\HermesWorkspace\mods\chatheads\dist\chatheads-0.1.1.hnmod` — 8440 bytes
+SHA-256 `16f5e1db33255c550c087fcf3ed982a4be9abf61b547b470a08f471d309ad1fe`
 
-It holds `horizon-native.json` (game 26.3, schema 1, pinned to Horizon `a46ce68` and horizon-mixins
-`3f99a5c6`) and `mixins/chatheads/`.
+It holds `horizon-native.json` (game 26.3, schema 1, hooks 2, pinned to Horizon `4aa6854` and
+horizon-mixins `a2af5c0`) and `mixins/chatheads/`.
 
 ## The form
 
@@ -24,8 +24,10 @@ https://playhorizon.dev/mods/submit — GitHub sign-in, then:
 - **Authors**: Alexander (Domanffe)
 - **Licence**: MIT
 - **Source**: https://github.com/Domanffe/chatheads
-- **File**: `chatheads-0.1.0.hnmod`
-- **Changelog**: First release: native mod for Horizon 26.3.
+- **File**: `chatheads-0.1.1.hnmod`
+- **Changelog**: Rebuilt on the 2026-11-01 Nightly (Horizon `4aa6854`). The three hook points it shares
+  (mods, settings, settings_click) are named now instead of pinned to a source target, so a Horizon
+  update that moves them no longer breaks the bundle.
 - Public key and signature: leave empty (unsigned).
 
 Known limit to mention if a reviewer asks: the chat's own hit-test does not know about the 10 px

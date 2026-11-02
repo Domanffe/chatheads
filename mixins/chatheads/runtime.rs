@@ -5,7 +5,7 @@
 
 pub const ID: &str = "chatheads";
 pub const NAME: &str = "ChatHeads";
-pub const VERSION: &str = "0.1.0";
+pub const VERSION: &str = "0.1.1";
 pub const DESCRIPTION: &str = "A player's head left of every chat line they wrote.";
 
 /// The head's side and the face's corner in a player skin, in GUI pixels: a

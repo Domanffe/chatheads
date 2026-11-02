@@ -38,7 +38,7 @@ The game build is the launcher's own:
 horizon-launcher native-build "…/mixins/chatheads" --trust-native-code
 ```
 
-It pins Horizon commit `a46ce6898bd72016e061aaec1afc1375b384deac` and hooks `Game::draw_chat` (HEAD and
+It pins Horizon commit `4aa6854a886183440256f4f4a4a9d1ed853227a1` and hooks `Game::draw_chat` (HEAD and
 RETURN) and `Chat::draw` (a variable), so it builds on that commit's source.
 
 ## Publishing

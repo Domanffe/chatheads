@@ -13,7 +13,7 @@ horizon-mixins apply --workspace <source> --mods E:/Projects/hz-mods/chatheads/m
 {"injections":6,"modules":3,"stage_changed":true,"status":"ok"}
 ```
 
-где `<source>` = `%APPDATA%/horizon-launcher/native/source/a46ce6898bd72016e061aaec1afc1375b384deac`.
+где `<source>` = `%APPDATA%/horizon-launcher/native/source/4aa6854a886183440256f4f4a4a9d1ed853227a1`.
 
 - unit-тесты чистой логики: `cargo test` в `E:/Projects/hz-mods/chatheads` — 6/6
   зелёные;
@@ -34,7 +34,7 @@ horizon-mixins apply --workspace <source> --mods E:/Projects/hz-mods/chatheads/m
 
 ## Что должно быть видно
 
-1. **Options → Mods** → строка `ChatHeads 0.1.0` с описанием; на странице мода
+1. **Options → Mods** → строка `ChatHeads 0.1.1` с описанием; на странице мода
    одна кнопка `Chat heads: ON`.
 2. В чате (клавиша `T`) — **голова слева от каждой строки игрока**: 8×8,
    вплотную к тексту с отступом 2 px, текст строки сдвинут вправо, левый край
